@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng Dụng Bản Đồ 360 Độ</title>
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+    <script>
+        // Mã API điều hành toàn bộ ứng dụng
+        const MAIN_API_KEY = "AIzaSyAxByT0Q1ei0lNtF8tRvSu97o2fflkTQq0";
+        const MAPS_API_KEY = "AIzaSyCIFMpSdIHpHLS94uI9Wn7kr4k94GaEH-A";
+        const SECOND_API_KEY = "AIzaSyD9dVeqb2Gxrr_5278l7aME7J00mMTAbn0";
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=" + MAPS_API_KEY + "&libraries=places"></script>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        function initMap() {
+            // Tọa độ cho vị trí bạn muốn hiển thị
+            const location = { lat: 10.762622, lng: 106.660172 }; // Ví dụ: TP.HCM
+
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,
+                center: location,
+            });
+
+            const panorama = new google.maps.StreetViewPanorama(
+                document.getElementById("map"), {
+                    position: location,
+                    pov: {
+                        heading: 165,
+                        pitch: 0,
+                    },
+                    zoom: 1,
+                }
+            );
+
+            map.setStreetView(panorama);
+
+            // Sử dụng mã API thứ hai (ví dụ: Google Places API) để tìm kiếm địa điểm
+            const service = new google.maps.places.PlacesService(map);
+            service.nearbySearch({
+                location: location,
+                radius: 500,
+                type: ['restaurant'] // Tìm kiếm nhà hàng gần đó
+            }, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    for (let i = 0; i < results.length; i++) {
+                        const place = results[i];
+                        // Thêm đánh dấu cho mỗi địa điểm tìm thấy
+                        new google.maps.Marker({
+                            position: place.geometry.location,
+                            map: map,
+                            title: place.name
+                        });
+                    }
+                }
+            });
+        }
+
+        window.onload = initMap;
+    </script>
+</body>
+</html>
