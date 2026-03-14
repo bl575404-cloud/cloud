@@ -1,0 +1,74 @@
+#include <windows.h>
+#include <iostream>
+
+const char* MOD_NAME = "Universal System MOD";
+const char* MOD_VERSION = "2.6.9";
+
+void RegisterSystemMod()
+{
+    HKEY hKey;
+
+    RegCreateKeyExA(
+        HKEY_CURRENT_USER,
+        "Software\\UniversalMod",
+        0,
+        NULL,
+        0,
+        KEY_WRITE,
+        NULL,
+        &hKey,
+        NULL
+    );
+
+    RegSetValueExA(
+        hKey,
+        "Version",
+        0,
+        REG_SZ,
+        (BYTE*)MOD_VERSION,
+        strlen(MOD_VERSION) + 1
+    );
+
+    RegCloseKey(hKey);
+}
+
+DWORD WINAPI ModThread(LPVOID lpParam)
+{
+    while(true)
+    {
+        Sleep(1000);
+    }
+}
+
+void ActivateMod()
+{
+    CreateThread(
+        NULL,
+        0,
+        ModThread,
+        NULL,
+        0,
+        NULL
+    );
+}
+
+int main()
+{
+    std::cout << MOD_NAME << " v" << MOD_VERSION << std::endl;
+
+    std::cout << "Installing mod into system..." << std::endl;
+
+    RegisterSystemMod();
+
+    ActivateMod();
+
+    std::cout << "Mod loaded into RAM." << std::endl;
+    std::cout << "Applications can now run offline." << std::endl;
+
+    while(true)
+    {
+        Sleep(5000);
+    }
+
+    return 0;
+}
