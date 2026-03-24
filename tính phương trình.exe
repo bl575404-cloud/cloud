@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Math Solver GOD MODE AI</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.30.0/plotly.min.js"></script>
+<style>
+body{font-family:'Segoe UI';background:#020617;color:white;padding:20px}
+.container{max-width:1100px;margin:auto;background:#020617;padding:20px;border-radius:20px}
+textarea{width:100%;padding:15px;border-radius:12px;border:none}
+button{padding:12px;border:none;border-radius:12px;margin-top:10px;cursor:pointer}
+.solve{background:#22c55e}.graph{background:#3b82f6}
+.result{margin-top:20px;padding:20px;background:#0f172a;border-radius:12px}
+.step{background:#020617;padding:10px;margin-top:10px;border-left:4px solid #22c55e}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🔥 Math Solver GOD MODE AI</h1>
+<textarea id="input" rows="4" placeholder="Ví dụ: giải sin(x)=0.5 hoặc log(x)+x=3 hoặc hệ x+y=2,x-y=0"></textarea>
+<button class="solve" onclick="solve()">Giải chi tiết như người 🚀</button>
+<button class="graph" onclick="drawGraph()">Vẽ đồ thị 📈</button>
+<div class="result" id="result"></div>
+<div id="graph"></div>
+</div>
+
+<script>
+async function solve(){
+  let input=document.getElementById("input").value;
+  let result=document.getElementById("result");
+  result.innerHTML="<div class='step'>⏳ Đang phân tích bằng AI...</div>";
+
+  // 👉 CHỖ NÀY GẮN API GPT
+  const API_KEY = "YOUR_OPENAI_API_KEY";
+
+  try{
+    let res = await fetch("https://api.openai.com/v1/chat/completions",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+API_KEY
+      },
+      body:JSON.stringify({
+        model:"gpt-4o-mini",
+        messages:[
+          {role:"system",content:"Bạn là giáo viên toán, giải chi tiết từng bước chuẩn SGK, rõ ràng, dễ hiểu."},
+          {role:"user",content:"Giải chi tiết: "+input}
+        ]
+      })
+    });
+
+    let data = await res.json();
+    let text = data.choices[0].message.content;
+
+    result.innerHTML = `<div class='step'>📘 Lời giải chi tiết:</div><div class='step'>${text.replace(/\n/g,"<br>")}</div>`;
+
+  }catch(err){
+    result.innerHTML = "❌ Lỗi API: "+err.message;
+  }
+}
+
+function drawGraph(){
+  let input=document.getElementById("input").value;
+  let expr=input.includes('=')?input.split('=')[0]:input;
+  let xV=[],yV=[];
+  for(let x=-10;x<=10;x+=0.1){
+    try{let y=math.evaluate(expr,{x:x});xV.push(x);yV.push(y);}catch{}
+  }
+  Plotly.newPlot('graph',[{x:xV,y:yV,type:'scatter'}]);
+}
+</script>
+</body>
+</html>
